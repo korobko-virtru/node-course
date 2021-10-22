@@ -1,0 +1,19 @@
+{
+  "name": "node-js-course",
+  "version": "1.0.0",
+  "description": "Capgemini Engineering NodeJS course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/korobko-virtru/node-course.git"
+  },
+  "author": "Alex Korobko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/korobko-virtru/node-course/issues"
+  },
+  "homepage": "https://github.com/korobko-virtru/node-course#readme"
+}
