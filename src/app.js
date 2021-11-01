@@ -9,4 +9,4 @@ const server = http.createServer((req, res) => {
     res.end();
 });
 
-server.listen({ port: APP_PORT }, () => logger(`Server is listening on port ${APP_PORT}. Env is ${ENV}.`));
+server.listen({ port: APP_PORT }, () => logger.log(`Server is listening on port ${APP_PORT}. Env is ${ENV}.`));
