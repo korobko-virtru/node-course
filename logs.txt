@@ -1,6 +1,0 @@
-{"level":30,"time":1636315519528,"pid":27258,"hostname":"ODL2101013","msg":"Server is listening on port 8000. Env is /Users/okorobko/Documents/Projects/node-course/node_modules/.bin/ts-node."}
-{"level":30,"time":1636315565276,"pid":27258,"hostname":"ODL2101013","msg":"Request info - url: /, params: {}."}
-{"level":30,"time":1636315699350,"pid":27258,"hostname":"ODL2101013","msg":"Request info - url: /user, params: {}."}
-{"level":30,"time":1636315824016,"pid":27333,"hostname":"ODL2101013","msg":"Server is listening on port 8000. Env is /Users/okorobko/Documents/Projects/node-course/node_modules/.bin/ts-node."}
-{"level":30,"time":1636315826292,"pid":27333,"hostname":"ODL2101013","msg":"Request info - url: /user, params: {}."}
-{"level":30,"time":1636315872266,"pid":27350,"hostname":"ODL2101013","msg":"Server is listening on port 8000. Env is /Users/okorobko/Documents/Projects/node-course/node_modules/.bin/ts-node."}
