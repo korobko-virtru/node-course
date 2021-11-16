@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import express from 'express';
 import config  from './config';
 import logger from './logger';
+import movieRouter from './router/movies';
 const app = express();
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -22,14 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!')
-});
-
-app.post('/user', (req: Request, res: Response) => {
-    console.log('body', req.body);
-    res.send('Hello User!')
-});
+app.use('/movies', movieRouter);
 
 app.get('*', function(req, res){
     res.status(404).send('Page not found.');
