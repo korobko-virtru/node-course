@@ -4,7 +4,7 @@ const compareFn = (order = 'asc', by = 'title' ) => (f:any, s:any) => {
     return 0;
 }
 
-export default function (data: any[], sortOrder: any, sortBy: any) {
+export default function (data: any[], sortOrder: string, sortBy: string) {
     if (sortOrder === undefined && sortBy === undefined) {
         return data;
     }

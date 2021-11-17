@@ -1,13 +1,13 @@
 import express, {Request, Response} from 'express';
-import {Movie} from "../types/movie";
+import {Movie, MovieQuery} from "../types/movie";
 import storage from '../storage/movie';
 import { v4 as uuidv4 } from 'uuid';
 import MovieService from "../service/movie";
 const router = express.Router();
 
 const getHandler = (req: Request, res: Response) => {
-    const { sortOrder, sortBy, limit, page } = req.query;
-    const movies = storage.getAll(sortOrder, sortBy, limit, page);
+    const { sortOrder = 'asc', sortBy = 'title', limit = 10, page = 1 } = req.query;
+    const movies = storage.getAll({sortOrder, sortBy, limit, page} as MovieQuery);
     res.json(movies);
 }
 

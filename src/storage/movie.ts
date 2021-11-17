@@ -374,7 +374,7 @@ const get = (id: string) => {
     return moviesList.movies[id];
 };
 
-const getAll = (sortOrder?: any, sortBy?: any, limit?: any, page?: any): Movie[] => {
+const getAll = ({sortOrder, sortBy, limit, page} : { sortOrder: string, sortBy: string, limit: number, page: number}): Movie[] => {
     const movies = Object.values(moviesList.movies);
     const sortedMovies = sortMovies(movies, sortOrder, sortBy);
     return paginateMovies(sortedMovies, limit, page);
@@ -383,7 +383,7 @@ const getAll = (sortOrder?: any, sortBy?: any, limit?: any, page?: any): Movie[]
 const add = (movie: Movie): void => {
     const currentMovie = get(movie.id);
     if(currentMovie) {
-        throw 'Movie already exists';
+        throw new Error('Movie already exists');
     }
     moviesList.movies[movie.id] = {...movie};
     moviesList.total++;
@@ -392,13 +392,14 @@ const add = (movie: Movie): void => {
 const update = (id: string, data: any): void => {
     const currentMovie = get(id);
     if (!currentMovie) {
-        throw 'Movie does not exist';
+        throw new Error('Movie does not exist');
     }
     moviesList.movies[id] = {...currentMovie, ...data};
 }
 
 const remove = (id: string): void => {
     delete moviesList.movies[id];
+    moviesList.total--;
 }
 
 export default {

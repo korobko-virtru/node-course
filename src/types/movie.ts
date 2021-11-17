@@ -1,3 +1,10 @@
+export interface MovieQuery {
+    sortOrder: string;
+    sortBy: string;
+    limit: number;
+    page: number;
+}
+
 export interface Movie {
     [index: string]: any;
 }

@@ -1,4 +1,4 @@
-export default function(data: any[], limit: number, pageNo: number) {
+export default function(data: any[], limit?: number, pageNo?: number) {
     if(!limit || !pageNo) {
         return data;
     }
