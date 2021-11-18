@@ -3,15 +3,15 @@ import express from 'express';
 import config  from './config';
 import logger from './logger';
 import movieRouter from './router/movies';
+import usersStorage from './storage/users';
 const app = express();
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    logger.error(`Server error: ${origin}, reason: ${err}`);
+    logger.error(`Server error: ${req.originalUrl}, reason: ${err}`);
     if (res.headersSent) {
         return next(err)
     }
-    res.status(500);
-    res.render('error', { error: err })
+    res.status(500).json({ error: err.message });
 }
 
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -24,6 +24,11 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use('/movies', movieRouter);
+
+app.post('/register', (req: Request, res: Response) => {
+    usersStorage.add(req.body)
+    res.sendStatus(200);
+});
 
 app.get('*', function(req, res){
     res.status(404).send('Page not found.');

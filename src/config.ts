@@ -12,5 +12,10 @@ function findArgsValueByKey(key: string, defaultValue: string) {
 export default {
     APP_PORT: process.env.APP_PORT || 8000,
     ENV: findArgsValueByKey('env', envDefault),
-    baseUrl
+    baseUrl,
+    cryptoConf: {
+        iterations: 1000,
+        keylen: 64,
+        digest: 'sha512',
+    }
 }
