@@ -1,5 +1,6 @@
 import {User, UserData} from "../types/user";
 import config from '../config';
+import { encrypt } from "../utils/jwt-utils";
 import * as crypto from "crypto";
 
 const users: User[] = []
@@ -47,6 +48,7 @@ const validateUser = ({username, userpassword}: UserData) => {
     if (!validatePassword(user, userpassword)) {
         throw new Error('Incorrect user password');
     }
+    return encrypt(username);
 }
 
 export default {

@@ -17,5 +17,6 @@ export default {
         iterations: 1000,
         keylen: 64,
         digest: 'sha512',
-    }
+    },
+    jwtSecret: 'secret'
 }
