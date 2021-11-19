@@ -367,6 +367,7 @@ const moviesList: MoviesList = {
             "id": "3cb502ec-3b11-47bd-a403-3f78d3f89492"
         }
     },
+    favorites: {},
     total: 0
 };
 
@@ -374,18 +375,41 @@ const get = (id: string) => {
     return moviesList.movies[id];
 };
 
-const getAll = ({sortOrder, sortBy, limit, page} : { sortOrder: string, sortBy: string, limit: number, page: number}): Movie[] => {
+const getAll = (
+    {
+        sortOrder,
+        sortBy,
+        limit,
+        page,
+    } : {
+        sortOrder: string,
+        sortBy: string,
+        limit: number,
+        page: number,
+    },
+    username?: string
+): {movies: Movie[], favMovies?: Movie[]} => {
     const movies = Object.values(moviesList.movies);
     const sortedMovies = sortMovies(movies, sortOrder, sortBy);
-    return paginateMovies(sortedMovies, limit, page);
+    const allMovies = paginateMovies(sortedMovies, limit, page);
+    const favMovies = username ? moviesList.favorites[username] : undefined;
+    return {
+        movies: allMovies,
+        ...(favMovies && {favMovies})
+    }
 };
 
-const add = (movie: Movie): void => {
+const add = (movie: Movie, username: string): void => {
     const currentMovie = get(movie.id);
     if(currentMovie) {
         throw new Error('Movie already exists');
     }
     moviesList.movies[movie.id] = {...movie};
+    if(moviesList.favorites[username] && moviesList.favorites[username].length) {
+        moviesList.favorites[username].push(movie);
+    } else {
+        moviesList.favorites[username] = [movie];
+    }
     moviesList.total++;
 };
 

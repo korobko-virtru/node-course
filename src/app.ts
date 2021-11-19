@@ -23,9 +23,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use('/movies',(req, res, next) => {
-
-}, movieRouter);
+app.use('/movies', movieRouter);
 
 app.post('/register', (req: Request, res: Response) => {
     usersStorage.add(req.body)
