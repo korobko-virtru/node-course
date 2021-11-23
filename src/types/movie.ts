@@ -13,5 +13,8 @@ export interface MoviesList {
     movies: {
         [key: string]: Movie
     };
+    favorites: {
+        [username: string]: Movie[]
+    };
     total: number;
 }

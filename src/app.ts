@@ -1,17 +1,18 @@
 import {NextFunction, Request, Response} from "express";
 import express from 'express';
-import config  from './config';
+import config from './config';
 import logger from './logger';
 import movieRouter from './router/movies';
+import usersStorage from './storage/users';
+
 const app = express();
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    logger.error(`Server error: ${origin}, reason: ${err}`);
+    logger.error(`Server error: ${req.originalUrl}, reason: ${err}`);
     if (res.headersSent) {
         return next(err)
     }
-    res.status(500);
-    res.render('error', { error: err })
+    res.status(500).json({error: err.message});
 }
 
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -20,12 +21,21 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+app.use(express.urlencoded({extended: true}));
 
 app.use('/movies', movieRouter);
 
-app.get('*', function(req, res){
+app.post('/register', (req: Request, res: Response) => {
+    usersStorage.add(req.body)
+    res.sendStatus(200);
+});
+
+app.post('/login', (req: Request, res: Response) => {
+    const token = usersStorage.validateUser(req.body);
+    res.json({token});
+});
+
+app.get('*', function (req, res) {
     res.status(404).send('Page not found.');
 });
 

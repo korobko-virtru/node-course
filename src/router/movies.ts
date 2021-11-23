@@ -1,13 +1,16 @@
-import express, {Request, Response} from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import {Movie, MovieQuery} from "../types/movie";
 import storage from '../storage/movie';
+import usersStorage from '../storage/users';
 import { v4 as uuidv4 } from 'uuid';
 import MovieService from "../service/movie";
 const router = express.Router();
 
+const MUTATION_METHODS = ['POST', 'PATCH', 'DELETE'];
+
 const getHandler = (req: Request, res: Response) => {
     const { sortOrder = 'asc', sortBy = 'title', limit = 10, page = 1 } = req.query;
-    const movies = storage.getAll({sortOrder, sortBy, limit, page} as MovieQuery);
+    const movies = storage.getAll({sortOrder, sortBy, limit, page} as MovieQuery, req.username);
     res.json(movies);
 }
 
@@ -24,13 +27,14 @@ const getByIdHandler = (req: Request, res: Response) => {
 
 const postHandler = async (req: Request, res: Response) => {
     const movie: Movie = req.body;
+    const username = req.username;
     movie.id = uuidv4();
     const { name, ...restInfo } = movie;
     const encodedComponent = encodeURIComponent(name);
     const encodedName = encodedComponent.replace('%20', '+');
     try {
         const data = await MovieService.searchMovie(encodedName);
-        storage.add(data ? {...data, ...restInfo} : movie);
+        storage.add(data ? {...data, ...restInfo} : movie, username!);
         res.json({id: movie.id});
     } catch (e) {
         res.json(e);
@@ -60,6 +64,24 @@ const deleteHandler = (req: Request, res: Response) => {
     }
 }
 
+const handleMutation = (req: Request, res: Response, next: NextFunction) => {
+    const { authorization } = req.headers;
+    if(!MUTATION_METHODS.includes(req.method)) {
+        const token = authorization?.split(' ')[1];
+        req['username'] = token ? usersStorage.authenticateUser(token) : undefined;
+        next();
+        return;
+    }
+    if (!authorization || !authorization.split(' ')[1]) {
+        next(new Error('No token was found'));
+    } else {
+        const token = authorization.split(' ')[1]
+        req['username'] = usersStorage.authenticateUser(token);
+        next()
+    }
+}
+
+router.use(handleMutation);
 router.get('/', getHandler);
 router.post('/', postHandler);
 router.get('/:id', getByIdHandler);
