@@ -1,6 +1,4 @@
-import {Movie, MoviesList} from "../types/movie";
-import sortMovies from '../utils/sort';
-import paginateMovies from '../utils/paginate';
+import {Movie, MovieQuery} from "../types/movie";
 import MovieModel from '../models/movie';
 import MovieService from "../service/movie";
 import userStorage from '../storage/users';
@@ -9,34 +7,34 @@ const get = (id: string) => {
     return MovieModel.findById(id);
 };
 
-const queryMoviesByIds = async (ids: string[]) => {
-    return MovieModel.find({_id: { $in: ids}});
+const queryMovies = async (query: any, {
+    sortOrder,
+    sortBy,
+    limit,
+    page,
+} : MovieQuery) => {
+    const limitInt = parseInt(limit);
+    const pageInt = parseInt(page);
+    return MovieModel
+        .find(query)
+        .sort({[sortBy]: sortOrder})
+        .limit(limitInt)
+        .skip(limitInt * (pageInt - 1))
+        .exec();
 }
 
 const getAll = async (
-    {
-        sortOrder,
-        sortBy,
-        limit,
-        page,
-    } : {
-        sortOrder: string,
-        sortBy: string,
-        limit: number,
-        page: number,
-    },
+    movieParams : MovieQuery,
     username?: string
 ): Promise<{movies: Movie[], favMovies?: Movie[] | undefined}> => {
     let favMovies;
-    const movies = await MovieModel.find({});
-    const sortedMovies = sortMovies(movies, sortOrder, sortBy);
-    const allMovies = paginateMovies(sortedMovies, limit, page);
+    const movies = await queryMovies({}, movieParams);
     const favMoviesId = username ? await userStorage.getUserMoviesIds(username) : undefined;
     if (favMoviesId) {
-        favMovies = await queryMoviesByIds(favMoviesId);
+        favMovies = await queryMovies({_id: { $in: favMoviesId}}, movieParams);
     }
     return {
-        movies: allMovies,
+        movies,
         ...(favMovies && {favMovies})
     }
 };

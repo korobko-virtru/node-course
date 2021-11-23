@@ -8,7 +8,7 @@ const router = express.Router();
 const MUTATION_METHODS = ['POST', 'PATCH', 'DELETE'];
 
 const getHandler = async (req: Request, res: Response) => {
-    const { sortOrder = 'asc', sortBy = 'title', limit = 10, page = 1 } = req.query;
+    const { sortOrder = 'asc', sortBy = 'Title', limit = '10', page = '1' } = req.query;
     const movies = await storage.getAll({sortOrder, sortBy, limit, page} as MovieQuery, req.username);
     res.json(movies);
 }
