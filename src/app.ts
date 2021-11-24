@@ -6,9 +6,8 @@ import movieRouter from './router/movies';
 import usersStorage from './storage/users';
 import getDbConnection from './db';
 
-const dbPath = 'mongodb://localhost:27017/test';
 const app = express();
-const db = getDbConnection(dbPath);
+const db = getDbConnection(config.dbPath);
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     logger.error(`Server error: ${req.originalUrl}, reason: ${err}`);
