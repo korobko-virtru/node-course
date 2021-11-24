@@ -1,8 +1,8 @@
 export interface MovieQuery {
     sortOrder: string;
     sortBy: string;
-    limit: number;
-    page: number;
+    limit: string;
+    page: string;
 }
 
 export interface Movie {

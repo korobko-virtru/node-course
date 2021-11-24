@@ -4,8 +4,10 @@ import config from './config';
 import logger from './logger';
 import movieRouter from './router/movies';
 import usersStorage from './storage/users';
+import getDbConnection from './db';
 
 const app = express();
+const db = getDbConnection(config.dbPath);
 
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     logger.error(`Server error: ${req.originalUrl}, reason: ${err}`);
@@ -30,9 +32,13 @@ app.post('/register', (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
-app.post('/login', (req: Request, res: Response) => {
-    const token = usersStorage.validateUser(req.body);
-    res.json({token});
+app.post('/login', async (req: Request, res: Response) => {
+    try {
+        const token = await usersStorage.validateUser(req.body);
+        res.json({token});
+    } catch ({message}) {
+        res.json({error: message});
+    }
 });
 
 app.get('*', function (req, res) {
@@ -41,13 +47,20 @@ app.get('*', function (req, res) {
 
 app.use(errorHandler);
 
-app.listen(config.APP_PORT, () => {
-    logger.info(`Server is listening on port ${config.APP_PORT}. Env is ${config.ENV}.`);
-})
+db
+    .on('error', (err) => {
+        logger.error(`Failed connecting to db: ${err.message}`);
+    })
+    .once('open', () => {
+        app.listen(config.APP_PORT, () => {
+            logger.info(`Server is listening on port ${config.APP_PORT}. Env is ${config.ENV}.`);
+        });
+    })
+
 
 process.on('unhandledRejection', (reason, promise) => {
     logger.error(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
-})
+});
 
 process.on('uncaughtException', (err, origin) => {
     logger.error(`Unhandled Exception at: ${origin}, reason: ${err}`);

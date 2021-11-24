@@ -2,22 +2,19 @@ import {User, UserData} from "../types/user";
 import config from '../config';
 import {decrypt, encrypt} from "../utils/jwt-utils";
 import * as crypto from "crypto";
+import UserModel from "../models/user";
 
-const users: User[] = [
-    {
-        username: 'test',
-        hash: '2737e3a7da8cf88ca84acf6b624bb745069c069468d455eb8088a56c161dbd8365fbf30cd18cbf1c3e8a701f1ee38fed65e55d23b9fd81f70090099ff27c7a93',
-        salt: '014fe164da5fc999c26f49b929c9a15c'
-    }
-]
+const get = (name: string) => {
+    return UserModel.findOne({username: name});
+};
 
-const get = (name: string) => users.find((user: User) => user.username === name);
-
-const add = ({username, userpassword}: UserData) => {
+const add = async ({username, userpassword}: UserData) => {
     if (!username || !userpassword) {
         throw new Error('Username and password are required');
     }
-    if (get(username)) {
+    const user = await get(username);
+
+    if (user) {
         throw new Error('User already exists');
     }
 
@@ -29,12 +26,11 @@ const add = ({username, userpassword}: UserData) => {
         config.cryptoConf.keylen,
         config.cryptoConf.digest
     ).toString(`hex`);
-    console.log('{username, hash, salt}', {username, hash, salt});
-    users.push({username, hash, salt});
+
+    await UserModel.create({username, hash, salt})
 }
 
 const validatePassword = (user: User, userpassword: string) => {
-
     const hash = crypto.pbkdf2Sync(
         userpassword,
         user.salt,
@@ -46,8 +42,8 @@ const validatePassword = (user: User, userpassword: string) => {
     return user.hash === hash;
 }
 
-const validateUser = ({username, userpassword}: UserData) => {
-    const user = get(username);
+const validateUser = async ({username, userpassword}: UserData) => {
+    const user = await get(username);
     if (!user) {
         throw new Error('User does not exist');
     }
@@ -58,18 +54,36 @@ const validateUser = ({username, userpassword}: UserData) => {
     return encrypt(username);
 }
 
-const authenticateUser = (token: string) => {
+const authenticateUser = async (token: string) => {
     const {username} = decrypt(token);
-    const user = get(username);
+    const user = await get(username);
     if (!user) {
         throw new Error('User does not exist');
     }
     return username;
 }
 
+const updataUserByName = async (username: string, movieId: string) => {
+    const user = await UserModel.findOne({username});
+    if (!user) {
+        throw new Error(`Can not find username: ${username}`);
+    }
+    const movieSet = new Set(user.favMovies);
+    movieSet.add(movieId);
+    user.favMovies = [...movieSet];
+    await user.save();
+}
+
+const getUserMoviesIds = async (username: string) => {
+    const user = await get(username);
+    return user!.favMovies;
+}
+
 export default {
     get,
     add,
     validateUser,
-    authenticateUser
+    authenticateUser,
+    updataUserByName,
+    getUserMoviesIds
 }

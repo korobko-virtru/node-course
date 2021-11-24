@@ -18,5 +18,6 @@ export default {
         keylen: 64,
         digest: 'sha512',
     },
-    jwtSecret: 'secret'
+    jwtSecret: 'secret',
+    dbPath: 'mongodb://localhost:27017/test',
 }
